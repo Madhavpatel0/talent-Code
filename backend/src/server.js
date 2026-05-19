@@ -10,8 +10,14 @@ const app = express();
 
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 
-app.use("/api/inngest", serve({ client: inngest, functions }));
-
+app.use(
+  "/api/inngest",
+  serve({
+    client: inngest,
+    functions,
+    signingKey: process.env.INNGEST_SIGNING_KEY, // 🔥 FIX
+  })
+);
 
 const __dirname = path.resolve();
 
