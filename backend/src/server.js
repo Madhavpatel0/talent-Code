@@ -19,7 +19,21 @@ app.use(express.json());
 
 app.use(clerkMiddleware());
 
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (
+      origin.includes("localhost") ||
+      origin.includes("vercel.app")
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
 
 app.use(
   "/api/inngest",
