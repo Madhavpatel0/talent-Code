@@ -1,17 +1,17 @@
-// Piston API is a service for code execution
+// ❌ OLD (remove this)
+// const PISTON_API = "https://emkc.org/api/v2/piston";
 
-const PISTON_API = "https://emkc.org/api/v2/piston";
+const BACKEND_API = "http://localhost:3000/run";
 
 const LANGUAGE_VERSIONS = {
-  javascript: { language: "javascript", version: "18.15.0" },
-  python: { language: "python", version: "3.10.0" },
-  java: { language: "java", version: "15.0.2" },
+  javascript: { language: "javascript" },
+  python: { language: "python" },
+  java: { language: "java" },
 };
 
 /**
- * @param {string} language - programming language
- * @param {string} code - source code to executed
- * @returns {Promise<{success:boolean, output?:string, error?: string}>}
+ * @param {string} language
+ * @param {string} code
  */
 export async function executeCode(language, code) {
   try {
@@ -24,20 +24,15 @@ export async function executeCode(language, code) {
       };
     }
 
-    const response = await fetch(`${PISTON_API}/execute`, {
+    // ✅ Backend call (IMPORTANT CHANGE)
+    const response = await fetch(BACKEND_API, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         language: languageConfig.language,
-        version: languageConfig.version,
-        files: [
-          {
-            name: `main.${getFileExtension(language)}`,
-            content: code,
-          },
-        ],
+        code: code,
       }),
     });
 
@@ -50,8 +45,9 @@ export async function executeCode(language, code) {
 
     const data = await response.json();
 
-    const output = data.run.output || "";
-    const stderr = data.run.stderr || "";
+    // ✅ Piston response handle
+    const output = data.run?.output || "";
+    const stderr = data.run?.stderr || "";
 
     if (stderr) {
       return {
@@ -71,14 +67,4 @@ export async function executeCode(language, code) {
       error: `Failed to execute code: ${error.message}`,
     };
   }
-}
-
-function getFileExtension(language) {
-  const extensions = {
-    javascript: "js",
-    python: "py",
-    java: "java",
-  };
-
-  return extensions[language] || "txt";
 }

@@ -59,6 +59,7 @@ export async function getActiveSessions(_, res) {
 export async function getMyRecentSessions(req, res) {
   try {
     const userId = req.user._id;
+    // console.log("User ID in getMyRecentSessions controller:", userId);
 
     // get sessions where user is either host or participant
     const sessions = await Session.find({
@@ -67,7 +68,7 @@ export async function getMyRecentSessions(req, res) {
     })
       .sort({ createdAt: -1 })
       .limit(20);
-
+    console.log("Recent sessions found:", sessions);
     res.status(200).json({ sessions });
   } catch (error) {
     console.log("Error in getMyRecentSessions controller:", error.message);
